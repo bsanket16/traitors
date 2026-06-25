@@ -31,8 +31,8 @@ export const theme = createTheme({
   typography: {
     fontFamily: '"Rajdhani", "SF Pro Display", "Segoe UI", system-ui, sans-serif',
     h1: { fontFamily: '"Orbitron", "Rajdhani", sans-serif', fontWeight: 900, letterSpacing: 0 },
-    h2: { fontFamily: '"Orbitron", "Rajdhani", sans-serif', fontWeight: 850, letterSpacing: 0, fontSize: '2.2rem' },
-    h3: { fontFamily: '"Orbitron", "Rajdhani", sans-serif', fontWeight: 850, letterSpacing: 0, fontSize: '1.8rem' },
+    h2: { fontFamily: '"Orbitron", "Rajdhani", sans-serif', fontWeight: 850, letterSpacing: 0 },
+    h3: { fontFamily: '"Orbitron", "Rajdhani", sans-serif', fontWeight: 850, letterSpacing: 0 },
     h4: { fontFamily: '"Orbitron", "Rajdhani", sans-serif', fontWeight: 800, letterSpacing: 0 },
     h5: { fontWeight: 800, letterSpacing: 0 },
     button: { fontFamily: '"Orbitron", "Rajdhani", sans-serif', fontWeight: 800, textTransform: 'uppercase', letterSpacing: 0 }
