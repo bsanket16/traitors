@@ -1,7 +1,8 @@
 import { Add, Login } from '@mui/icons-material';
-import { Button, Paper, Stack, Typography } from '@mui/material';
+import { Box, Button, Paper, Stack, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { Page } from '../components/Page';
+import logoImage from '../images/logo.png';
 
 export function HomePage() {
   const navigate = useNavigate();
@@ -9,7 +10,8 @@ export function HomePage() {
     <Page>
       <Stack className="center-stack home-hero">
         <Stack textAlign="center" gap={1.2} className="home-title">
-          <Typography variant="h1" fontSize={{ xs: 54, sm: 76 }}>Traitors</Typography>
+          {/* <Box component="img" src={logoImage} alt="Traitors" sx={{ maxWidth: 280, height: 'auto', marginBottom: 1 }} /> */}
+          <Typography variant="h1" fontSize={{ xs: 36, sm: 54 }}>Traitors</Typography>
           <Typography color="text.secondary">A modern social deduction game of trust, pressure, and hidden intent.</Typography>
         </Stack>
         <Paper elevation={0} className="game-card home-action-panel" sx={{ p: { xs: 2, sm: 2.5 } }}>
