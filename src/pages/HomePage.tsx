@@ -15,7 +15,7 @@ export function HomePage() {
         <Paper elevation={0} className="game-card home-action-panel" sx={{ p: { xs: 2, sm: 2.5 } }}>
           <Stack gap={1.5} className="home-action-stack">
             <Button className="home-action-button" startIcon={<Add />} size="large" variant="contained" onClick={() => navigate('/create')}>Create Room</Button>
-            <Button className="home-action-button" startIcon={<Login />} size="large" variant="outlined" onClick={() => navigate('/join')}>Join Room</Button>
+            <Button className="home-action-button" startIcon={<Login />} size="large" variant="outlined" onClick={() => navigate('/join')}>Join Roome</Button>
           </Stack>
         </Paper>
       </Stack>

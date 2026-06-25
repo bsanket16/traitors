@@ -27,7 +27,7 @@ import {
 const app = express();
 const allowedOrigins = (process.env.CLIENT_ORIGIN ?? 'http://localhost:5173')
   .split(',')
-  .map((origin) => origin.trim())
+  .map((origin) => origin.trim().replace(/\/$/, ''))
   .filter(Boolean);
 const server = createServer(app);
 const io = new Server<ClientToServerEvents, ServerToClientEvents>(server, {
