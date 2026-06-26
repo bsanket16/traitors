@@ -24,7 +24,7 @@ export function CreateRoomPage() {
           <Stack gap={2}>
             {error && <Alert severity="error">{error}</Alert>}
             <TextField label="Player Name" value={name} onChange={(event) => setName(event.target.value)} autoFocus />
-            <Button startIcon={<AcUnit />} type="submit" variant="contained" disabled={!name.trim()}>New Village</Button>
+            <Button className="action-button" startIcon={<AcUnit />} type="submit" variant="contained" disabled={!name.trim()}>New Village</Button>
           </Stack>
         </Paper>
       </Stack>

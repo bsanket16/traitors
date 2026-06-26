@@ -29,27 +29,30 @@ interface GameStore {
 }
 
 const storageKey = 'traitors.session';
-const sessionId = localStorage.getItem('traitors.sessionId') ?? crypto.randomUUID();
-localStorage.setItem('traitors.sessionId', sessionId);
+const sessionIdKey = 'traitors.sessionId';
+const sessionId = sessionStorage.getItem(sessionIdKey) ?? crypto.randomUUID();
+sessionStorage.setItem(sessionIdKey, sessionId);
 let reconnectInFlight: Promise<boolean> | null = null;
 
 const saveSession = (state: ClientGameState) => {
-  localStorage.setItem(storageKey, JSON.stringify({ roomId: state.roomId, playerId: state.currentPlayerId }));
+  sessionStorage.setItem(storageKey, JSON.stringify({ roomId: state.roomId, playerId: state.currentPlayerId }));
 };
 
 const clearSession = () => {
+  sessionStorage.removeItem(storageKey);
   localStorage.removeItem(storageKey);
+  localStorage.removeItem(sessionIdKey);
 };
 
 const readSession = () => {
-  const saved = localStorage.getItem(storageKey);
+  const saved = sessionStorage.getItem(storageKey);
   if (!saved) return null;
   try {
     const parsed = JSON.parse(saved) as { roomId?: string; playerId?: string };
     if (!parsed.roomId || !parsed.playerId) return null;
     return { roomId: parsed.roomId, playerId: parsed.playerId };
   } catch {
-    localStorage.removeItem(storageKey);
+    sessionStorage.removeItem(storageKey);
     return null;
   }
 };
@@ -79,14 +82,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
     socket.off('toast');
     socket.off('playerDisconnected');
     socket.off('connect');
+    socket.off('connect_error');
     socket.on('gameState', (state) => {
       saveSession(state);
-      set({ state, error: null });
+      set({ state, error: null, loading: false });
     });
     socket.on('toast', (toast) => set({ toast }));
     socket.on('playerDisconnected', (name) => set({ toast: `${name} disconnected` }));
     socket.on('connect', () => {
       if (readSession()) void get().reconnect();
+    });
+    socket.on('connect_error', () => {
+      set({ loading: false, error: 'Connection lost. Trying to reconnect...' });
     });
   },
   createRoom: async (name) => {
@@ -121,21 +128,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
     return reconnectInFlight;
   },
   action: async (name) => {
+    get().connect();
     set({ loading: true, error: null });
     const response = await request<ClientGameState>((callback) => socket.emit(name, callback));
     return handleResponse(set, response);
   },
   submitKillVote: async (targetId) => {
+    get().connect();
     set({ loading: true, error: null });
     const response = await request<ClientGameState>((callback) => socket.emit('submitKillVote', { targetId }, callback));
     return handleResponse(set, response);
   },
   submitSaveVote: async (targetId) => {
+    get().connect();
     set({ loading: true, error: null });
     const response = await request<ClientGameState>((callback) => socket.emit('submitSaveVote', { targetId }, callback));
     return handleResponse(set, response);
   },
   submitEliminationVote: async (targetId) => {
+    get().connect();
     set({ loading: true, error: null });
     const response = await request<ClientGameState>((callback) => socket.emit('submitEliminationVote', { targetId }, callback));
     return handleResponse(set, response);

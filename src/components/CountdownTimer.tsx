@@ -21,7 +21,7 @@ export function CountdownTimer({ seconds, onComplete, label = 'Revealing the res
   }, [onComplete, seconds]);
 
   return (
-    <Stack alignItems="center" gap={2}>
+    <Stack className="screen-panel" alignItems="center" gap={2}>
       <CircularProgress color="primary" size={92} variant="determinate" value={(remaining / seconds) * 100} />
       <Typography variant="h2">{remaining}</Typography>
       <Typography color="text.secondary">{label}</Typography>

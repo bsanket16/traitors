@@ -21,7 +21,6 @@ export function HomePage() {
               size="large"
               variant="contained"
               onClick={() => navigate('/create')}
-              sx={{ '& .MuiButton-startIcon': { mr: 0.1 } }}
             >
               New Village
             </Button>

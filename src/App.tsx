@@ -1,6 +1,6 @@
 import { Alert, Snackbar } from '@mui/material';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { LoadingOverlay } from './components/LoadingOverlay';
 import { Page } from './components/Page';
@@ -33,9 +33,21 @@ function RequireGame({ children }: { children: JSX.Element }) {
   const reconnect = useGameStore((store) => store.reconnect);
   const loading = useGameStore((store) => store.loading);
   const location = useLocation();
+  const [restoring, setRestoring] = useState(!state);
 
   useEffect(() => {
-    if (!state) void reconnect();
+    let active = true;
+    if (!state) {
+      setRestoring(true);
+      void reconnect().finally(() => {
+        if (active) setRestoring(false);
+      });
+    } else {
+      setRestoring(false);
+    }
+    return () => {
+      active = false;
+    };
   }, [reconnect, state]);
 
   useEffect(() => {
@@ -49,13 +61,15 @@ function RequireGame({ children }: { children: JSX.Element }) {
     return () => window.removeEventListener('beforeunload', warn);
   }, [state]);
 
-  if (!state) {
+  if (!state && restoring) {
     return (
       <Page>
         <LoadingOverlay open={loading} />
       </Page>
     );
   }
+
+  if (!state) return <Navigate to="/" replace />;
 
   const currentPlayer = state.players.find((player) => player.id === state.currentPlayerId);
   const isOverseer = state.currentPlayerId === state.hostId;

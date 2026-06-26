@@ -9,7 +9,7 @@ export function EliminatedPage() {
   return (
     <Stack gap={2}>
       <RoomHeader state={state} />
-      <Paper elevation={0} sx={{ p: 3, textAlign: 'center' }}>
+      <Paper elevation={0} className="screen-panel" sx={{ p: 3, textAlign: 'center' }}>
         <Stack gap={2} alignItems="center">
           <PersonOff color="error" sx={{ fontSize: 64 }} />
           <Typography variant="h4">You have been eliminated.</Typography>

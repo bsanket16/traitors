@@ -23,7 +23,7 @@ function RoleReminder({ role }: { role: Role | null }) {
   if (!role) return null;
 
   return (
-    <Paper elevation={0} sx={{ p: 2, textAlign: 'center' }}>
+    <Paper elevation={0} className="screen-panel" sx={{ p: 2, textAlign: 'center' }}>
       <Stack gap={1}>
         <Button
           startIcon={<Visibility />}
@@ -67,7 +67,7 @@ export function RoleRevealPage() {
       {error && <Alert severity="error">{error}</Alert>}
       <Typography color="text.secondary" textAlign="center">Hide your screen before revealing.</Typography>
       <RoleCard role={state.currentPlayerRole} />
-      <Paper elevation={0} sx={{ p: 2 }}>
+      <Paper elevation={0} className="screen-panel" sx={{ p: 2 }}>
         <Stack gap={0.5}>
           <Typography color="primary" fontWeight={900}>IMPORTANT</Typography>
           <Typography color="text.secondary">
@@ -76,7 +76,7 @@ export function RoleRevealPage() {
           </Typography>
         </Stack>
       </Paper>
-      <Button startIcon={<VisibilityOff />} variant="contained" size="large" onClick={() => action('acknowledgeRole')}>I Have Seen My Role</Button>
+      <Button className="action-button" startIcon={<VisibilityOff />} variant="contained" size="large" onClick={() => action('acknowledgeRole')}>I Have Seen My Role</Button>
     </Stack>
   );
 }

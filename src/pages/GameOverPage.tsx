@@ -3,7 +3,7 @@ import { Avatar, Button, Chip, Paper, Stack, Typography } from '@mui/material';
 import { PlayerCard } from '../components/PlayerCard';
 import { RoomHeader } from '../components/RoomHeader';
 import { roleLabels, winnerLabels } from '../content/labels';
-import logo from '../images/logo.png';
+import traitorLogo from '../images/role-traitor.png';
 import { useGameStore } from '../store/gameStore';
 
 export function GameOverPage() {
@@ -15,14 +15,14 @@ export function GameOverPage() {
       <RoomHeader state={state} />
       <Paper elevation={0} className="game-card finale-card" sx={{ p: { xs: 2.5, sm: 3.5 }, textAlign: 'center' }}>
         <Stack gap={1.6} alignItems="center">
-          <img className="finale-logo" src={logo} alt="Traitors" />
+          <img className="finale-logo" src={traitorLogo} alt="Traitor" />
           <Chip className="phase-pill" size="small" label="Final Reveal" variant="outlined" />
           <Typography variant="h3">{state.winner ? winnerLabels[state.winner] : 'Game Over'}</Typography>
           {state.lastResult && <Typography color="text.secondary">{state.lastResult.message}</Typography>}
         </Stack>
         {isOverseer && (
           <Stack gap={1.2} mt={2}>
-            <Button startIcon={<Replay />} variant="contained" onClick={() => action('newGame')}>Gather a New Village</Button>
+            <Button className="action-button" startIcon={<Replay />} variant="contained" onClick={() => action('newGame')}>Gather a New Village</Button>
           </Stack>
         )}
       </Paper>

@@ -58,7 +58,7 @@ export function PhaseVotePage({ kind }: { kind: VoteKind }) {
     <Stack gap={2}>
       <RoomHeader state={state} />
       {error && <Alert severity="error">{error}</Alert>}
-      <CinematicText phase={copy[kind].phase} title={copy[kind].title} lines={copy[kind].lines} subtitle={copy[kind].subtitle} />
+      <CinematicText phase={copy[kind].phase} title={copy[kind].title} lines={copy[kind].lines} emphasis={copy[kind].subtitle} />
       <Stack gap={1.2}>
         {choices.map((player, index) => (
           <motion.div key={player.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 + index * 0.06 }}>
@@ -66,7 +66,9 @@ export function PhaseVotePage({ kind }: { kind: VoteKind }) {
           </motion.div>
         ))}
       </Stack>
-      <Typography color="text.secondary" textAlign="center">Every player participates to keep roles hidden. Do not discuss your selection.</Typography>
+      <Typography className="screen-panel" color="text.secondary" textAlign="center">
+        Every player participates to keep roles hidden. Do not discuss your selection.
+      </Typography>
       <ConfirmationDialog
         open={Boolean(target)}
         title="Submit vote?"

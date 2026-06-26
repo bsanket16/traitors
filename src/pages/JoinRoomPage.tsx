@@ -26,7 +26,7 @@ export function JoinRoomPage() {
             {error && <Alert severity="error">{error}</Alert>}
             <TextField label="Player Name" value={name} onChange={(event) => setName(event.target.value)} />
             <TextField label="Village Code" value={roomId} onChange={(event) => setRoomId(event.target.value.toUpperCase())} />
-            <Button startIcon={<Group />} type="submit" variant="contained" disabled={!name.trim() || !roomId.trim()}>Join Village</Button>
+            <Button className="action-button" startIcon={<Group />} type="submit" variant="contained" disabled={!name.trim() || !roomId.trim()}>Join Village</Button>
           </Stack>
         </Paper>
       </Stack>

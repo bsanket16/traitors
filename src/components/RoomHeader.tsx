@@ -13,6 +13,9 @@ export function RoomHeader({ state }: RoomHeaderProps) {
   const hasGameStarted = state.phase !== 'lobby';
   const action = useGameStore((store) => store.action);
   const copyCode = async () => navigator.clipboard?.writeText(state.roomId);
+  const restart = () => {
+    if (window.confirm('Restart this game with the same players?')) void action('restartGame');
+  };
   const shareCode = async () => {
     if (navigator.share) await navigator.share({ title: 'Join Traitors', text: `Village code: ${state.roomId}` });
     else await copyCode();
@@ -39,14 +42,14 @@ export function RoomHeader({ state }: RoomHeaderProps) {
         </Box>
         <Stack direction="row" gap={1} className="header-actions">
           {isOverseer && hasGameStarted && state.phase !== 'gameOver' && (
-            <Button aria-label="Restart game" onClick={() => action('restartGame')} variant="outlined" sx={{ minWidth: 52, px: 0 }}>
+            <Button aria-label="Restart game" title="Restart game" onClick={restart} variant="outlined">
               <RestartAlt />
             </Button>
           )}
-          <Button aria-label="Copy village code" onClick={copyCode} variant="outlined" sx={{ minWidth: 52, px: 0 }}>
+          <Button aria-label="Copy village code" title="Copy village code" onClick={copyCode} variant="outlined">
             <ContentCopy />
           </Button>
-          <Button aria-label="Share village code" onClick={shareCode} variant="outlined" sx={{ minWidth: 52, px: 0 }}>
+          <Button aria-label="Share village code" title="Share village code" onClick={shareCode} variant="outlined">
             <IosShare />
           </Button>
         </Stack>

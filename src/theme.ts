@@ -47,9 +47,8 @@ export const theme = createTheme({
           minHeight: 56,
           borderRadius: 8,
           boxShadow: 'none',
-          fontSize: '1rem',
+          fontSize: '1.05rem',
           justifyContent: 'center',
-          gap: 8,
           paddingInline: 22
         },
         containedPrimary: {
@@ -61,6 +60,16 @@ export const theme = createTheme({
         outlined: {
           borderColor: 'rgba(197,182,106,0.36)',
           color: '#D8E6C1'
+        }
+      }
+    },
+    MuiButtonBase: {
+      styleOverrides: {
+        root: {
+          '& .MuiButton-startIcon': {
+            marginRight: 10,
+            marginLeft: 0
+          }
         }
       }
     },

@@ -51,10 +51,16 @@ const publicPlayer = (player: Player): PublicPlayer => ({
 });
 
 const alivePlayers = (room: Room) => [...room.players.values()].filter((player) => player.isAlive);
+const connectedAlivePlayers = (room: Room) => alivePlayers(room).filter((player) => player.isConnected);
 const livingNonTraitors = (room: Room) => alivePlayers(room).filter((player) => player.role !== 'traitor').length;
 const livingTraitors = (room: Room) => alivePlayers(room).filter((player) => player.role === 'traitor').length;
 
-const requiredVotes = (room: Room) => alivePlayers(room).length;
+const requiredVotes = (room: Room) => Math.max(1, connectedAlivePlayers(room).length);
+const submittedVotes = (room: Room, votes: Map<string, string>) =>
+  [...votes.keys()].filter((playerId) => {
+    const player = room.players.get(playerId);
+    return Boolean(player?.isAlive && player.isConnected);
+  }).length;
 
 const shuffle = <T>(items: T[]) => {
   const copy = [...items];
@@ -66,10 +72,15 @@ const shuffle = <T>(items: T[]) => {
 };
 
 const getPendingCounts = (room: Room) => {
-  if (room.phase === 'kill') return { submitted: room.killVotes.size, required: requiredVotes(room) };
-  if (room.phase === 'save') return { submitted: room.saveVotes.size, required: requiredVotes(room) };
-  if (room.phase === 'voting') return { submitted: room.eliminationVotes.size, required: requiredVotes(room) };
+  if (room.phase === 'kill') return { submitted: submittedVotes(room, room.killVotes), required: requiredVotes(room) };
+  if (room.phase === 'save') return { submitted: submittedVotes(room, room.saveVotes), required: requiredVotes(room) };
+  if (room.phase === 'voting') return { submitted: submittedVotes(room, room.eliminationVotes), required: requiredVotes(room) };
   return null;
+};
+
+const connectedPlayersHaveSeenRoles = (room: Room) => {
+  const connectedPlayers = [...room.players.values()].filter((player) => player.isConnected);
+  return connectedPlayers.length > 0 && connectedPlayers.every((player) => player.hasSeenRole);
 };
 
 export const getRoom = (roomId: string) => rooms.get(roomId.toUpperCase()) ?? null;
@@ -244,9 +255,7 @@ export const acknowledgeRole = (room: Room, playerId: string) => {
   if (!player) throw new Error('Player not found');
   if (room.phase !== 'roleReveal') throw new Error('Roles are not being revealed now');
   player.hasSeenRole = true;
-  if ([...room.players.values()].every((roomPlayer) => roomPlayer.hasSeenRole)) {
-    room.phase = 'kill';
-  }
+  if (connectedPlayersHaveSeenRoles(room)) room.phase = 'kill';
 };
 
 const checkTraitorWin = (room: Room) => {
@@ -266,7 +275,7 @@ export const submitKillVote = (room: Room, playerId: string, targetId: string) =
   if (!target?.isAlive || target.id === player.id) throw new Error('Choose another alive player');
   if (room.killVotes.has(playerId)) throw new Error('You already submitted');
   room.killVotes.set(playerId, targetId);
-  if (room.killVotes.size === requiredVotes(room)) {
+  if (submittedVotes(room, room.killVotes) >= requiredVotes(room)) {
     if (room.doctorExists) room.phase = 'save';
     else resolveNight(room);
   }
@@ -280,7 +289,7 @@ export const submitSaveVote = (room: Room, playerId: string, targetId: string) =
   if (!target?.isAlive) throw new Error('Choose an alive player');
   if (room.saveVotes.has(playerId)) throw new Error('You already submitted');
   room.saveVotes.set(playerId, targetId);
-  if (room.saveVotes.size === requiredVotes(room)) resolveNight(room);
+  if (submittedVotes(room, room.saveVotes) >= requiredVotes(room)) resolveNight(room);
 };
 
 export const resolveNight = (room: Room) => {
@@ -334,7 +343,17 @@ export const submitEliminationVote = (room: Room, playerId: string, targetId: st
   if (!target?.isAlive || target.id === player.id) throw new Error('Choose another alive player');
   if (room.eliminationVotes.has(playerId)) throw new Error('You already submitted');
   room.eliminationVotes.set(playerId, targetId);
-  if (room.eliminationVotes.size === requiredVotes(room)) resolveElimination(room);
+  if (submittedVotes(room, room.eliminationVotes) >= requiredVotes(room)) resolveElimination(room);
+};
+
+export const advanceReadyPhase = (room: Room) => {
+  if (room.phase === 'roleReveal' && connectedPlayersHaveSeenRoles(room)) room.phase = 'kill';
+  if (room.phase === 'kill' && submittedVotes(room, room.killVotes) >= requiredVotes(room)) {
+    if (room.doctorExists) room.phase = 'save';
+    else resolveNight(room);
+  }
+  if (room.phase === 'save' && submittedVotes(room, room.saveVotes) >= requiredVotes(room)) resolveNight(room);
+  if (room.phase === 'voting' && submittedVotes(room, room.eliminationVotes) >= requiredVotes(room)) resolveElimination(room);
 };
 
 export const eliminatePlayer = (room: Room, playerId: string, targetId: string) => {

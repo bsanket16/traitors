@@ -7,6 +7,7 @@ import { Server } from 'socket.io';
 import type { ClientToServerEvents, ServerToClientEvents, SocketResponse } from '../shared/types.js';
 import {
   acknowledgeRole,
+  advanceReadyPhase,
   buildState,
   createRoom,
   disconnectPlayer,
@@ -246,6 +247,7 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     const match = disconnectPlayer(socket.id);
     if (match) {
+      advanceReadyPhase(match.room);
       socket.to(match.room.id).emit('playerDisconnected', match.player.name);
       broadcastState(match.room.id);
     }
