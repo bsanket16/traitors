@@ -31,9 +31,27 @@ interface GameStore {
 const storageKey = 'traitors.session';
 const sessionId = localStorage.getItem('traitors.sessionId') ?? crypto.randomUUID();
 localStorage.setItem('traitors.sessionId', sessionId);
+let reconnectInFlight: Promise<boolean> | null = null;
 
 const saveSession = (state: ClientGameState) => {
   localStorage.setItem(storageKey, JSON.stringify({ roomId: state.roomId, playerId: state.currentPlayerId }));
+};
+
+const clearSession = () => {
+  localStorage.removeItem(storageKey);
+};
+
+const readSession = () => {
+  const saved = localStorage.getItem(storageKey);
+  if (!saved) return null;
+  try {
+    const parsed = JSON.parse(saved) as { roomId?: string; playerId?: string };
+    if (!parsed.roomId || !parsed.playerId) return null;
+    return { roomId: parsed.roomId, playerId: parsed.playerId };
+  } catch {
+    localStorage.removeItem(storageKey);
+    return null;
+  }
 };
 
 const request = <T>(send: (callback: (response: SocketResponse<T>) => void) => void) =>
@@ -60,33 +78,47 @@ export const useGameStore = create<GameStore>((set, get) => ({
     socket.off('gameState');
     socket.off('toast');
     socket.off('playerDisconnected');
+    socket.off('connect');
     socket.on('gameState', (state) => {
       saveSession(state);
       set({ state, error: null });
     });
     socket.on('toast', (toast) => set({ toast }));
     socket.on('playerDisconnected', (name) => set({ toast: `${name} disconnected` }));
+    socket.on('connect', () => {
+      if (readSession()) void get().reconnect();
+    });
   },
   createRoom: async (name) => {
     get().connect();
-    set({ loading: true, error: null });
+    clearSession();
+    set({ state: null, loading: true, error: null });
     const response = await request<ClientGameState>((callback) => socket.emit('createRoom', { name, sessionId }, callback));
     return handleResponse(set, response);
   },
   joinRoom: async (name, roomId) => {
     get().connect();
-    set({ loading: true, error: null });
+    clearSession();
+    set({ state: null, loading: true, error: null });
     const response = await request<ClientGameState>((callback) => socket.emit('joinRoom', { name, roomId, sessionId }, callback));
     return handleResponse(set, response);
   },
   reconnect: async () => {
-    const saved = localStorage.getItem(storageKey);
+    const saved = readSession();
     if (!saved) return false;
+    if (reconnectInFlight) return reconnectInFlight;
     get().connect();
     set({ loading: true, error: null });
-    const { roomId, playerId } = JSON.parse(saved) as { roomId: string; playerId: string };
-    const response = await request<ClientGameState>((callback) => socket.emit('reconnectPlayer', { roomId, playerId, sessionId }, callback));
-    return handleResponse(set, response);
+    reconnectInFlight = request<ClientGameState>((callback) => socket.emit('reconnectPlayer', { ...saved, sessionId }, callback))
+      .then((response) => {
+        const ok = handleResponse(set, response);
+        if (!ok) clearSession();
+        return ok;
+      })
+      .finally(() => {
+        reconnectInFlight = null;
+      });
+    return reconnectInFlight;
   },
   action: async (name) => {
     set({ loading: true, error: null });

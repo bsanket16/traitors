@@ -28,7 +28,7 @@ export function ResultPage() {
       {!voteResult && ready && (
         <Paper elevation={0} sx={{ p: 3, textAlign: 'center' }}>
           <Stack gap={2}>
-            <CinematicText title="RESULT SEALED" lines={['The room waits for the Overseer.', 'The next truth is seconds away.']} />
+            <CinematicText phase="Sunrise" title="THE RESULT IS SEALED" lines={['The village waits for the Overseer.', 'The next truth is seconds away.']} />
             {isOverseer && <Button variant="contained" onClick={() => action('revealResult')}>Reveal Result</Button>}
           </Stack>
         </Paper>
@@ -36,8 +36,8 @@ export function ResultPage() {
       {voteResult && ready && (
         <Paper elevation={0} sx={{ p: 3, textAlign: 'center' }}>
           <Stack gap={2}>
-            <CinematicText title="THE COUNCIL HAS SPOKEN" lines={resultText} />
-            {isOverseer && <Button variant="contained" onClick={() => action('nextRound')}>Begin Next Round</Button>}
+            <CinematicText phase="Council" title="THE COUNCIL HAS SPOKEN" lines={resultText} />
+            {isOverseer && <Button variant="contained" onClick={() => action('nextRound')}>Enter the Next Night</Button>}
           </Stack>
         </Paper>
       )}

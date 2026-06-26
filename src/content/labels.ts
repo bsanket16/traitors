@@ -18,6 +18,6 @@ export const phaseLabels: Record<Phase, string> = {
 };
 
 export const winnerLabels = {
-  traitors: 'Traitor Win',
+  traitors: 'Traitors Win',
   innocents: 'Citizens Win'
 };

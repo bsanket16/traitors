@@ -4,38 +4,38 @@ export const theme = createTheme({
   palette: {
     mode: 'dark',
     background: {
-      default: '#050505',
-      paper: 'rgba(17, 17, 17, 0.72)'
+      default: '#080D0C',
+      paper: 'rgba(17, 21, 19, 0.82)'
     },
     primary: {
-      main: '#C6FF00',
-      contrastText: '#050505'
+      main: '#A4D65E',
+      contrastText: '#FFFFFF'
     },
     secondary: {
-      main: '#FF3B3B'
+      main: '#8B2E2E'
     },
     success: {
-      main: '#C6FF00'
+      main: '#78A639'
     },
     warning: {
-      main: '#ffc857'
+      main: '#C5B66A'
     },
     error: {
-      main: '#FF3B3B'
+      main: '#8B2E2E'
     },
     text: {
-      primary: '#FFFFFF',
-      secondary: '#A0A0A0'
+      primary: '#D8E6C1',
+      secondary: '#AFA98F'
     }
   },
   typography: {
     fontFamily: '"Rajdhani", "SF Pro Display", "Segoe UI", system-ui, sans-serif',
-    h1: { fontFamily: '"Orbitron", "Rajdhani", sans-serif', fontWeight: 900, letterSpacing: 0 },
-    h2: { fontFamily: '"Orbitron", "Rajdhani", sans-serif', fontWeight: 850, letterSpacing: 0 },
-    h3: { fontFamily: '"Orbitron", "Rajdhani", sans-serif', fontWeight: 850, letterSpacing: 0 },
-    h4: { fontFamily: '"Orbitron", "Rajdhani", sans-serif', fontWeight: 800, letterSpacing: 0 },
+    h1: { fontFamily: '"Cinzel", "Rajdhani", sans-serif', fontWeight: 900, letterSpacing: 0 },
+    h2: { fontFamily: '"Cinzel", "Rajdhani", sans-serif', fontWeight: 850, letterSpacing: 0 },
+    h3: { fontFamily: '"Cinzel", "Rajdhani", sans-serif', fontWeight: 850, letterSpacing: 0 },
+    h4: { fontFamily: '"Cinzel", "Rajdhani", sans-serif', fontWeight: 800, letterSpacing: 0 },
     h5: { fontWeight: 800, letterSpacing: 0 },
-    button: { fontFamily: '"Orbitron", "Rajdhani", sans-serif', fontWeight: 800, textTransform: 'uppercase', letterSpacing: 0 }
+    button: { fontFamily: '"Rajdhani", "SF Pro Display", "Segoe UI", system-ui, sans-serif', fontWeight: 800, textTransform: 'uppercase', letterSpacing: 0 }
   },
   shape: {
     borderRadius: 8
@@ -53,20 +53,24 @@ export const theme = createTheme({
           paddingInline: 22
         },
         containedPrimary: {
-          boxShadow: '0 0 24px rgba(198, 255, 0, 0.22)'
+          color: '#FFFFFF',
+          backgroundImage: 'linear-gradient(180deg, rgba(164, 214, 94, 0.95), rgba(63, 77, 57, 0.98))',
+          border: '1px solid rgba(216, 230, 193, 0.3)',
+          boxShadow: '0 0 26px rgba(120, 166, 57, 0.22), inset 0 1px 0 rgba(255,255,255,0.18)'
         },
         outlined: {
-          borderColor: 'rgba(198,255,0,0.34)'
+          borderColor: 'rgba(197,182,106,0.36)',
+          color: '#D8E6C1'
         }
       }
     },
     MuiPaper: {
       styleOverrides: {
         root: {
-          backgroundImage: 'linear-gradient(145deg, rgba(255,255,255,0.105), rgba(255,255,255,0.035))',
-          border: '1px solid rgba(198,255,0,0.16)',
+          backgroundImage: 'linear-gradient(145deg, rgba(30,34,30,0.9), rgba(8,13,12,0.92))',
+          border: '1px solid rgba(197,182,106,0.22)',
           backdropFilter: 'blur(18px)',
-          boxShadow: '0 20px 70px rgba(0,0,0,0.38)'
+          boxShadow: '0 22px 70px rgba(0,0,0,0.48), inset 0 0 0 1px rgba(216,230,193,0.035)'
         }
       }
     },

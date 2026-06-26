@@ -13,11 +13,11 @@ export function LobbyPage() {
     <Stack gap={2}>
       <RoomHeader state={state} />
       {error && <Alert severity="error">{error}</Alert>}
-      <Typography variant="h5">{state.players.length} players joined</Typography>
+      <Typography variant="h5">{state.players.length} villagers gathered</Typography>
       <Stack gap={1}>{state.players.map((player) => <PlayerCard key={player.id} player={player} />)}</Stack>
       {isOverseer && (
         <Button startIcon={<PlayArrow />} size="large" variant="contained" disabled={state.players.length < 4} onClick={() => action('startGame')}>
-          Begin Game
+          Begin the Night
         </Button>
       )}
       {!isOverseer && <Typography color="text.secondary" textAlign="center">Waiting for the Overseer to begin.</Typography>}

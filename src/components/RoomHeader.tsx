@@ -14,7 +14,7 @@ export function RoomHeader({ state }: RoomHeaderProps) {
   const action = useGameStore((store) => store.action);
   const copyCode = async () => navigator.clipboard?.writeText(state.roomId);
   const shareCode = async () => {
-    if (navigator.share) await navigator.share({ title: 'Join Traitors', text: `Room code: ${state.roomId}` });
+    if (navigator.share) await navigator.share({ title: 'Join Traitors', text: `Village code: ${state.roomId}` });
     else await copyCode();
   };
 
@@ -22,9 +22,9 @@ export function RoomHeader({ state }: RoomHeaderProps) {
     return (
       <Paper elevation={0} className="game-card compact-status" sx={{ p: 2 }}>
         <Stack gap={0.8} textAlign="center">
-          <Typography variant="overline" color="primary">Current Act</Typography>
-          <Typography variant="h5">{phaseLabels[state.phase]}</Typography>
-          <Typography color="text.secondary">Round {state.currentRound} / {state.players.filter((player) => player.isAlive).length} alive</Typography>
+          <Chip className="phase-pill" size="small" label={phaseLabels[state.phase]} variant="outlined" sx={{ alignSelf: 'center' }} />
+          <Typography variant="h5">Round {state.currentRound}</Typography>
+          <Typography color="text.secondary">{state.players.filter((player) => player.isAlive).length} alive in the village</Typography>
         </Stack>
       </Paper>
     );
@@ -34,7 +34,7 @@ export function RoomHeader({ state }: RoomHeaderProps) {
     <Paper elevation={0} className="game-card overseer-panel" sx={{ p: 2 }}>
       <Stack direction="row" alignItems="center" justifyContent="space-between" gap={1}>
         <Box>
-          <Typography variant="overline" color="text.secondary">{isOverseer ? 'Overseer Room' : 'Room'}</Typography>
+          <Typography variant="overline" color="text.secondary">{isOverseer ? 'Overseer Village' : 'Village Code'}</Typography>
           <Typography variant="h4">{state.roomId}</Typography>
         </Box>
         <Stack direction="row" gap={1} className="header-actions">
@@ -43,10 +43,10 @@ export function RoomHeader({ state }: RoomHeaderProps) {
               <RestartAlt />
             </Button>
           )}
-          <Button aria-label="Copy room code" onClick={copyCode} variant="outlined" sx={{ minWidth: 52, px: 0 }}>
+          <Button aria-label="Copy village code" onClick={copyCode} variant="outlined" sx={{ minWidth: 52, px: 0 }}>
             <ContentCopy />
           </Button>
-          <Button aria-label="Share room code" onClick={shareCode} variant="outlined" sx={{ minWidth: 52, px: 0 }}>
+          <Button aria-label="Share village code" onClick={shareCode} variant="outlined" sx={{ minWidth: 52, px: 0 }}>
             <IosShare />
           </Button>
         </Stack>

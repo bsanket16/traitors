@@ -77,7 +77,7 @@ export const getRoom = (roomId: string) => rooms.get(roomId.toUpperCase()) ?? nu
 export const getPlayerBySocket = (socketId: string) => {
   for (const room of rooms.values()) {
     for (const player of room.players.values()) {
-      if (player.socketId === socketId) return { room, player };
+      if (player.isConnected && player.socketId === socketId) return { room, player };
     }
   }
   return null;
@@ -174,6 +174,7 @@ export const reconnectPlayer = (roomId: string, playerId: string, socketId: stri
   const room = getRoom(roomId);
   const player = room?.players.get(playerId);
   if (!room || !player) throw new Error('Could not reconnect to that room');
+  if (sessionId && player.sessionId && player.sessionId !== sessionId) throw new Error('That village session belongs to another device');
 
   player.socketId = socketId;
   player.sessionId = sessionId ?? player.sessionId;
@@ -185,6 +186,7 @@ export const disconnectPlayer = (socketId: string) => {
   const match = getPlayerBySocket(socketId);
   if (!match) return null;
   match.player.isConnected = false;
+  match.player.socketId = '';
   return match;
 };
 
@@ -195,6 +197,7 @@ export const leaveRoom = (socketId: string) => {
 
   if (room.phase !== 'lobby') {
     player.isConnected = false;
+    player.socketId = '';
     return { room, player };
   }
 

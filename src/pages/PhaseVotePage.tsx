@@ -10,22 +10,25 @@ import { useGameStore } from '../store/gameStore';
 
 type VoteKind = 'kill' | 'save' | 'elimination';
 
-const copy: Record<VoteKind, { title: string; lines: string[]; subtitle: string; confirm: string }> = {
+const copy: Record<VoteKind, { phase: string; title: string; lines: string[]; subtitle: string; confirm: string; note?: string }> = {
   kill: {
-    title: 'THE NIGHT HAS FALLEN',
-    lines: ['A shadow moves through the darkness.', 'Choose a player.'],
-    subtitle: 'Your selection is private. Do not reveal your choice.',
-    confirm: 'Your selection is private and cannot be changed.'
+    phase: 'Night',
+    title: 'WHO SHOULD DIE TONIGHT?',
+    lines: ['Point to the name you would remove from the village.'],
+    subtitle: "Every player must choose. Only the Traitor's choice decides the kill.",
+    confirm: "Every player submits to protect identities. Only the Traitor's choice will count."
   },
   save: {
-    title: 'FATE HANGS IN THE BALANCE',
-    lines: ['Someone may yet survive the night.', 'Choose a player.'],
-    subtitle: 'Your selection is private. Do not reveal your choice.',
-    confirm: 'Your selection is private and cannot be changed.'
+    phase: 'Night',
+    title: 'WHO SHOULD BE PROTECTED?',
+    lines: ['Choose the person you would guard from the dark.'],
+    subtitle: "Every player must choose. Only the Guardian's choice can prevent a death.",
+    confirm: "Every player submits to protect identities. Only the Guardian's choice will count."
   },
   elimination: {
-    title: 'THE COUNCIL DECIDES',
-    lines: ['Every voice matters.', 'Who do you believe is the Traitor?'],
+    phase: 'Council',
+    title: 'WHO IS THE TRAITOR?',
+    lines: ['Cast your vote before the village loses its nerve.'],
     subtitle: 'Choose carefully. The room will remember.',
     confirm: 'Your vote is final once submitted.'
   }
@@ -55,7 +58,7 @@ export function PhaseVotePage({ kind }: { kind: VoteKind }) {
     <Stack gap={2}>
       <RoomHeader state={state} />
       {error && <Alert severity="error">{error}</Alert>}
-      <CinematicText title={copy[kind].title} lines={copy[kind].lines} subtitle={copy[kind].subtitle} />
+      <CinematicText phase={copy[kind].phase} title={copy[kind].title} lines={copy[kind].lines} subtitle={copy[kind].subtitle} />
       <Stack gap={1.2}>
         {choices.map((player, index) => (
           <motion.div key={player.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 + index * 0.06 }}>
@@ -63,7 +66,7 @@ export function PhaseVotePage({ kind }: { kind: VoteKind }) {
           </motion.div>
         ))}
       </Stack>
-      <Typography color="text.secondary" textAlign="center">Every player participates. Do not discuss your selection.</Typography>
+      <Typography color="text.secondary" textAlign="center">Every player participates to keep roles hidden. Do not discuss your selection.</Typography>
       <ConfirmationDialog
         open={Boolean(target)}
         title="Submit vote?"

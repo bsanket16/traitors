@@ -1,6 +1,8 @@
 import express from 'express';
 import cors from 'cors';
 import { createServer } from 'node:http';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { Server } from 'socket.io';
 import type { ClientToServerEvents, ServerToClientEvents, SocketResponse } from '../shared/types.js';
 import {
@@ -25,6 +27,8 @@ import {
 } from './game.js';
 
 const app = express();
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const clientDist = path.resolve(__dirname, '../../client');
 const allowedOrigins = (process.env.CLIENT_ORIGIN ?? 'http://localhost:5173')
   .split(',')
   .map((origin) => origin.trim().replace(/\/$/, ''))
@@ -39,8 +43,10 @@ const io = new Server<ClientToServerEvents, ServerToClientEvents>(server, {
 
 app.use(cors({ origin: allowedOrigins }));
 app.use(express.json());
+app.use(express.static(clientDist));
 
 app.get('/health', (_request, response) => response.json({ ok: true }));
+app.get('*', (_request, response) => response.sendFile(path.join(clientDist, 'index.html')));
 
 const port = Number(process.env.PORT ?? 3001);
 
@@ -63,10 +69,18 @@ const handle = <T>(callback: (response: SocketResponse<T>) => void, action: () =
   }
 };
 
+const detachSocketFromCurrentRoom = (socketId: string) => {
+  const previous = leaveRoom(socketId);
+  if (!previous) return;
+  socketId && io.sockets.sockets.get(socketId)?.leave(previous.room.id);
+  broadcastState(previous.room.id);
+};
+
 io.on('connection', (socket) => {
   socket.on('createRoom', ({ name, sessionId }, callback) => {
     handle(callback, () => {
       if (!name.trim()) throw new Error('Enter your name');
+      detachSocketFromCurrentRoom(socket.id);
       const { room, player } = createRoom(name, socket.id, sessionId ?? socket.id);
       socket.join(room.id);
       return buildState(room, player.id);
@@ -77,6 +91,7 @@ io.on('connection', (socket) => {
     handle(callback, () => {
       if (!name.trim()) throw new Error('Enter your name');
       if (!roomId.trim()) throw new Error('Enter a room code');
+      detachSocketFromCurrentRoom(socket.id);
       const { room, player } = joinRoom(roomId, name, socket.id, sessionId ?? socket.id);
       socket.join(room.id);
       broadcastState(room.id);
@@ -86,6 +101,8 @@ io.on('connection', (socket) => {
 
   socket.on('reconnectPlayer', ({ roomId, playerId, sessionId }, callback) => {
     handle(callback, () => {
+      const current = getPlayerBySocket(socket.id);
+      if (current && (current.room.id !== roomId || current.player.id !== playerId)) detachSocketFromCurrentRoom(socket.id);
       const { room, player } = reconnectPlayer(roomId, playerId, socket.id, sessionId);
       socket.join(room.id);
       broadcastState(room.id);

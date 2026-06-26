@@ -1,4 +1,4 @@
-import { ArrowBack, Login } from '@mui/icons-material';
+import { ArrowBack, Group } from '@mui/icons-material';
 import { Alert, Button, IconButton, Paper, Stack, TextField, Typography } from '@mui/material';
 import { FormEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -20,13 +20,13 @@ export function JoinRoomPage() {
     <Page>
       <IconButton aria-label="Back" onClick={() => navigate('/')} sx={{ alignSelf: 'flex-start' }}><ArrowBack /></IconButton>
       <Stack className="center-stack" component="form" onSubmit={submit}>
-        <Typography variant="h2">Join Room</Typography>
-        <Paper elevation={0} sx={{ p: 2.5 }}>
+        <Typography variant="h2">Join Village</Typography>
+        <Paper elevation={0} className="game-card screen-panel" sx={{ p: 2.5 }}>
           <Stack gap={2}>
             {error && <Alert severity="error">{error}</Alert>}
             <TextField label="Player Name" value={name} onChange={(event) => setName(event.target.value)} />
-            <TextField label="Room ID" value={roomId} onChange={(event) => setRoomId(event.target.value.toUpperCase())} />
-            <Button startIcon={<Login />} type="submit" variant="contained" disabled={!name.trim() || !roomId.trim()}>Join</Button>
+            <TextField label="Village Code" value={roomId} onChange={(event) => setRoomId(event.target.value.toUpperCase())} />
+            <Button startIcon={<Group />} type="submit" variant="contained" disabled={!name.trim() || !roomId.trim()}>Join Village</Button>
           </Stack>
         </Paper>
       </Stack>
