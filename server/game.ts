@@ -287,6 +287,7 @@ export const submitSaveVote = (room: Room, playerId: string, targetId: string) =
   if (room.phase !== 'save') throw new Error('Save voting is not active');
   if (!player?.isAlive) throw new Error('Only alive players can vote');
   if (!target?.isAlive) throw new Error('Choose an alive player');
+  if (player.role === 'doctor' && target.id === player.id) throw new Error('Choose another alive player');
   if (room.saveVotes.has(playerId)) throw new Error('You already submitted');
   room.saveVotes.set(playerId, targetId);
   if (submittedVotes(room, room.saveVotes) >= requiredVotes(room)) resolveNight(room);

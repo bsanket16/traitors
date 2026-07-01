@@ -41,7 +41,8 @@ export function PhaseVotePage({ kind }: { kind: VoteKind }) {
 
   const submitted = state.submitted[kind];
   const currentPlayer = state.players.find((player) => player.id === state.currentPlayerId);
-  const choices = state.players.filter((player) => player.isAlive && (kind === 'save' || player.id !== state.currentPlayerId));
+  const canSelectSelf = kind === 'save' && state.currentPlayerRole !== 'doctor';
+  const choices = state.players.filter((player) => player.isAlive && (canSelectSelf || player.id !== state.currentPlayerId));
   const target = state.players.find((player) => player.id === targetId);
   const submit = async () => {
     if (!targetId) return;
