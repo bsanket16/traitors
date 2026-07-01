@@ -14,7 +14,6 @@ export function EliminatedPage() {
           <PersonOff color="error" sx={{ fontSize: 64 }} />
           <Typography variant="h4">You have been eliminated.</Typography>
           <Typography color="text.secondary">You can watch game progress and results, but you cannot vote or perform actions.</Typography>
-          {state.lastResult && <Typography>{state.lastResult.message}</Typography>}
         </Stack>
       </Paper>
     </Stack>

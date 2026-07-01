@@ -10,7 +10,7 @@ export function HomePage() {
     <Page>
       <Stack className="center-stack home-hero">
         <Stack textAlign="center" gap={1.2} className="home-title">
-          <img className="home-logo" src={logo} alt="Traitors" />
+          <img className="home-logo" src={logo} alt="The Traitor" />
           <Typography color="text.secondary">A modern social deduction game of trust, pressure, and hidden intent.</Typography>
         </Stack>
         <Paper elevation={0} className="game-card home-action-panel" sx={{ p: { xs: 2, sm: 2.5 } }}>

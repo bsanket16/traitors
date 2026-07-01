@@ -2,7 +2,7 @@ export const rumors = [
   'The loudest player is not always a Citizen.',
   'Silence can be a strategy.',
   'Trust is the strongest weapon in the room.',
-  'Traitors often accuse first.',
+  'The Traitor often accuses first.',
   'A saved player may not be a Citizen.',
   'A confident story can still be a lie.',
   'Watch who changes their vote too quickly.',

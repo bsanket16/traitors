@@ -1,25 +1,20 @@
 import { Paper, Stack, Typography } from '@mui/material';
 import type { Role } from '../../shared/types';
 import { roleLabels } from '../content/labels';
-import citizenImage from '../images/role-citizen.png';
-import guardianImage from '../images/role-guardian.png';
-import traitorImage from '../images/role-traitor.png';
+import { RoleEmblem } from './RoleEmblem';
 
-const copy: Record<Role, { title: string; body: string; image: string }> = {
+const copy: Record<Role, { title: string; body: string }> = {
   traitor: {
     title: 'You are the Traitor',
-    body: 'Secretly choose one player to eliminate each night. Blend in when everyone talks.',
-    image: traitorImage
+    body: 'Secretly choose one player to eliminate each night. Blend in when everyone talks.'
   },
   doctor: {
     title: 'You are the Guardian',
-    body: 'Each night, choose one player who might survive the darkness. You may choose yourself.',
-    image: guardianImage
+    body: 'Each night, choose one player who might survive the darkness. You may choose yourself.'
   },
   innocent: {
     title: 'You are a Citizen',
-    body: 'Watch the room. Measure every claim. Help expose the Traitor before trust runs out.',
-    image: citizenImage
+    body: 'Watch the room. Measure every claim. Help expose the Traitor before trust runs out.'
   }
 };
 
@@ -28,7 +23,7 @@ export function RoleCard({ role }: { role: Role }) {
   return (
     <Paper elevation={0} className="game-card role-card screen-panel" sx={{ p: 3, minHeight: 300, display: 'grid', placeItems: 'center', textAlign: 'center' }}>
       <Stack gap={2} alignItems="center">
-        <img className="role-art" src={roleCopy.image} alt={roleLabels[role]} />
+        <RoleEmblem className="role-art" role={role} />
         <Typography variant="overline" color="text.secondary">{roleLabels[role]}</Typography>
         <Typography variant="h4">{roleCopy.title}</Typography>
         <Typography color="text.secondary">{roleCopy.body}</Typography>

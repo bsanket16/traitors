@@ -255,5 +255,5 @@ io.on('connection', (socket) => {
 });
 
 server.listen(port, () => {
-  console.log(`Traitors server listening on http://localhost:${port}`);
+  console.log(`The Traitor server listening on http://localhost:${port}`);
 });

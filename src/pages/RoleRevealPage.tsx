@@ -26,6 +26,7 @@ function RoleReminder({ role }: { role: Role | null }) {
     <Paper elevation={0} className="screen-panel" sx={{ p: 2, textAlign: 'center' }}>
       <Stack gap={1}>
         <Button
+          className="action-button"
           startIcon={<Visibility />}
           variant="outlined"
           onMouseDown={start}

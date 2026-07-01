@@ -2,6 +2,7 @@ import { Button, Stack, Typography } from '@mui/material';
 import { useCallback, useState } from 'react';
 import { CinematicText } from '../components/CinematicText';
 import { CountdownTimer } from '../components/CountdownTimer';
+import { ResultCallout } from '../components/ResultCallout';
 import { RoomHeader } from '../components/RoomHeader';
 import { useGameStore } from '../store/gameStore';
 
@@ -15,7 +16,7 @@ export function ResultPage() {
 
   const isOverseer = state.currentPlayerId === state.hostId;
   const voteResult = state.lastResult?.kind === 'vote' && state.lastResult.round === state.currentRound;
-  const councilSubtitle = state.lastResult?.tied ? 'No name carried enough weight. No one was banished.' : state.lastResult?.message ?? '';
+  const councilSubtitle = state.lastResult?.tied ? 'No name carried enough weight. No one was banished.' : undefined;
 
   return (
     <Stack gap={2}>
@@ -30,6 +31,7 @@ export function ResultPage() {
       {voteResult && ready && (
         <>
           <CinematicText phase="Council" title="THE COUNCIL HAS SPOKEN" lines={['The village has made its choice.']} emphasis={councilSubtitle} />
+          <ResultCallout result={state.lastResult} />
           {isOverseer && <Button className="action-button" variant="contained" onClick={() => action('nextRound')}>Enter the Next Night</Button>}
         </>
       )}

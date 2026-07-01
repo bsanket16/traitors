@@ -1,6 +1,6 @@
 export type Role = 'traitor' | 'doctor' | 'innocent';
 export type Phase = 'lobby' | 'roleReveal' | 'kill' | 'save' | 'result' | 'discussion' | 'voting' | 'gameOver';
-export type Winner = 'traitors' | 'innocents' | null;
+export type Winner = 'traitor' | 'innocents' | null;
 
 export interface PublicPlayer {
   id: string;

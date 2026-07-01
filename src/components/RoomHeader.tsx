@@ -17,7 +17,7 @@ export function RoomHeader({ state }: RoomHeaderProps) {
     if (window.confirm('Restart this game with the same players?')) void action('restartGame');
   };
   const shareCode = async () => {
-    if (navigator.share) await navigator.share({ title: 'Join Traitors', text: `Village code: ${state.roomId}` });
+    if (navigator.share) await navigator.share({ title: 'Join The Traitor', text: `Village code: ${state.roomId}` });
     else await copyCode();
   };
 

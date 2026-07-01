@@ -3,7 +3,7 @@ import { Rumor } from './Rumor';
 
 export function WaitingScreen({ submitted, required }: { submitted?: number; required?: number }) {
   return (
-    <Stack gap={2}>
+    <Stack gap={2} className="app-panel">
       <Paper elevation={0} className="game-card" sx={{ p: 3, textAlign: 'center' }}>
         <Stack gap={2} alignItems="center">
           <CircularProgress color="primary" />

@@ -226,7 +226,7 @@ export const leaveRoom = (socketId: string) => {
 
 export const startGame = (room: Room, playerId: string) => {
   if (room.hostId !== playerId) throw new Error('Only the Overseer can begin the game');
-  if (room.players.size < 4) throw new Error('Traitors needs at least 4 players');
+  if (room.players.size < 4) throw new Error('The Traitor needs at least 4 players');
   if (room.phase !== 'lobby') throw new Error('Game already started');
 
   const players = shuffle([...room.players.values()]);
@@ -260,7 +260,7 @@ export const acknowledgeRole = (room: Room, playerId: string) => {
 
 const checkTraitorWin = (room: Room) => {
   if (livingTraitors(room) >= livingNonTraitors(room)) {
-    room.winner = 'traitors';
+    room.winner = 'traitor';
     room.phase = 'gameOver';
     return true;
   }
@@ -374,7 +374,7 @@ export const eliminatePlayer = (room: Room, playerId: string, targetId: string) 
     room.winner = 'innocents';
     room.phase = 'gameOver';
   } else if (finalCouncil) {
-    room.winner = 'traitors';
+    room.winner = 'traitor';
     room.phase = 'gameOver';
   } else {
     checkTraitorWin(room);
@@ -400,7 +400,7 @@ const resolveElimination = (room: Room) => {
       kind: 'vote'
     };
     if (finalCouncil) {
-      room.winner = 'traitors';
+      room.winner = 'traitor';
       room.phase = 'gameOver';
     } else {
       room.phase = 'result';
@@ -427,7 +427,7 @@ const resolveElimination = (room: Room) => {
     return;
   }
   if (finalCouncil) {
-    room.winner = 'traitors';
+    room.winner = 'traitor';
     room.phase = 'gameOver';
     return;
   }

@@ -44,12 +44,14 @@ export const theme = createTheme({
     MuiButton: {
       styleOverrides: {
         root: {
-          minHeight: 56,
-          borderRadius: 8,
+          minHeight: 64,
+          borderRadius: 6,
           boxShadow: 'none',
           fontSize: '1.05rem',
           justifyContent: 'center',
-          paddingInline: 22
+          paddingInline: 22,
+          gap: 0,
+          lineHeight: 1.1
         },
         containedPrimary: {
           color: '#FFFFFF',
@@ -67,8 +69,13 @@ export const theme = createTheme({
       styleOverrides: {
         root: {
           '& .MuiButton-startIcon': {
+            width: 28,
             marginRight: 10,
-            marginLeft: 0
+            marginLeft: 0,
+            justifyContent: 'center'
+          },
+          '& .MuiButton-startIcon > svg': {
+            fontSize: 26
           }
         }
       }

@@ -17,7 +17,8 @@ export const phaseLabels: Record<Phase, string> = {
   gameOver: 'Game Over'
 };
 
-export const winnerLabels = {
-  traitors: 'Traitors Win',
-  innocents: 'Citizens Win'
+export const winnerLabels: Record<string, string> = {
+  traitor: 'Traitor Wins',
+  traitors: 'Traitor Wins',
+  innocents: 'Citizen Wins'
 };

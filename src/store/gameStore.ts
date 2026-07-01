@@ -28,8 +28,8 @@ interface GameStore {
   clearToast: () => void;
 }
 
-const storageKey = 'traitors.session';
-const sessionIdKey = 'traitors.sessionId';
+const storageKey = 'the-traitor.session';
+const sessionIdKey = 'the-traitor.sessionId';
 const sessionId = sessionStorage.getItem(sessionIdKey) ?? crypto.randomUUID();
 sessionStorage.setItem(sessionIdKey, sessionId);
 let reconnectInFlight: Promise<boolean> | null = null;

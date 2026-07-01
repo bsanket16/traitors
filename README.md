@@ -1,4 +1,4 @@
-# Traitors
+# The Traitor
 
 Mobile-first in-person social deduction game built with React, Vite, TypeScript, MUI, Zustand, Express, and Socket.IO.
 

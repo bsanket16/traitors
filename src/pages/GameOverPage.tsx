@@ -1,24 +1,26 @@
 import { Replay } from '@mui/icons-material';
 import { Avatar, Button, Chip, Paper, Stack, Typography } from '@mui/material';
 import { PlayerCard } from '../components/PlayerCard';
+import { RoleEmblem } from '../components/RoleEmblem';
 import { RoomHeader } from '../components/RoomHeader';
 import { roleLabels, winnerLabels } from '../content/labels';
-import traitorLogo from '../images/role-traitor.png';
 import { useGameStore } from '../store/gameStore';
 
 export function GameOverPage() {
   const { state, action } = useGameStore();
   if (!state) return null;
   const isOverseer = state.currentPlayerId === state.hostId;
+  const winnerRole = state.winner === 'innocents' ? 'innocent' : 'traitor';
   return (
     <Stack gap={2}>
       <RoomHeader state={state} />
       <Paper elevation={0} className="game-card finale-card" sx={{ p: { xs: 2.5, sm: 3.5 }, textAlign: 'center' }}>
         <Stack gap={1.6} alignItems="center">
-          <img className="finale-logo" src={traitorLogo} alt="Traitor" />
+          <div className="finale-mark">
+            <RoleEmblem className="finale-logo" role={winnerRole} />
+          </div>
           <Chip className="phase-pill" size="small" label="Final Reveal" variant="outlined" />
           <Typography variant="h3">{state.winner ? winnerLabels[state.winner] : 'Game Over'}</Typography>
-          {state.lastResult && <Typography color="text.secondary">{state.lastResult.message}</Typography>}
         </Stack>
         {isOverseer && (
           <Stack gap={1.2} mt={2}>
