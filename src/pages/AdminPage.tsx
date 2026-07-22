@@ -3,6 +3,7 @@ import { Alert, Button, IconButton, Paper, Stack, TextField, Typography } from '
 import { FormEvent, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Page } from '../components/Page';
+import { apiRequest } from '../api';
 
 interface Analytics {
   villagesCreated: number; gamesPlayed: number; completedGames: number; abandonedGames: number; averageGroupSize: number; traitorWins: number; citizenWins: number; feedbackReceived: number; completionRate: number; lastUpdatedAt: string | null;
@@ -23,7 +24,7 @@ export function AdminPage() {
     if (!accessToken) return;
     setLoading(true);
     try {
-      const response = await fetch('/api/admin/stats', { headers: { Authorization: `Bearer ${accessToken}` } });
+      const response = await apiRequest('/api/admin/stats', { headers: { Authorization: `Bearer ${accessToken}` } });
       const result = await response.json() as Analytics & { error?: string };
       if (!response.ok) throw new Error(result.error ?? 'Could not load analytics.');
       setStats(result);
@@ -42,7 +43,7 @@ export function AdminPage() {
     event.preventDefault();
     setLoading(true);
     try {
-      const response = await fetch('/api/admin/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password }) });
+      const response = await apiRequest('/api/admin/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password }) });
       const result = await response.json() as { token?: string; error?: string };
       if (!response.ok || !result.token) throw new Error(result.error ?? 'Could not sign in.');
       sessionStorage.setItem(tokenKey, result.token);

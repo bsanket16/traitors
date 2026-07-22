@@ -1,5 +1,6 @@
 import { Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, TextField, Typography } from '@mui/material';
 import { FormEvent, useState } from 'react';
+import { apiRequest } from '../api';
 
 export function FeedbackDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [name, setName] = useState('');
@@ -21,7 +22,7 @@ export function FeedbackDialog({ open, onClose }: { open: boolean; onClose: () =
     setSending(true);
     setError('');
     try {
-      const response = await fetch('/api/feedback', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, contact, message }) });
+      const response = await apiRequest('/api/feedback', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, contact, message }) });
       const result = await response.json() as { error?: string };
       if (!response.ok) throw new Error(result.error ?? 'Could not send feedback.');
       setSent(true);
