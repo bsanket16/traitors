@@ -37,7 +37,8 @@ const request = async <T>(route: string, init: RequestInit = {}): Promise<T> => 
   });
   if (!response.ok) throw new Error(`Supabase request failed (${response.status})`);
   if (response.status === 204) return undefined as T;
-  return response.json() as Promise<T>;
+  const body = await response.text();
+  return body ? JSON.parse(body) as T : undefined as T;
 };
 
 const recordActivity = (activity: Record<string, number>) => {
