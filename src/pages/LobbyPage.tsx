@@ -1,4 +1,4 @@
-import { PlayArrow } from '@mui/icons-material';
+import { AcUnit } from '@mui/icons-material';
 import { Alert, Button, Stack, Typography } from '@mui/material';
 import { PlayerCard } from '../components/PlayerCard';
 import { RoomHeader } from '../components/RoomHeader';
@@ -16,7 +16,7 @@ export function LobbyPage() {
       <Typography className="screen-panel" variant="h5">{state.players.length} villagers gathered</Typography>
       <Stack gap={1}>{state.players.map((player) => <PlayerCard key={player.id} player={player} />)}</Stack>
       {isOverseer && (
-        <Button className="action-button" startIcon={<PlayArrow />} size="large" variant="contained" disabled={state.players.length < 4} onClick={() => action('startGame')}>
+        <Button className="action-button" startIcon={<AcUnit />} size="large" variant="contained" disabled={state.players.length < 4} onClick={() => action('startGame')}>
           Begin the Night
         </Button>
       )}

@@ -488,6 +488,20 @@ input {
   padding-inline: 18px !important;
 }
 
+.confirmation-dialog-actions,
+.feedback-dialog-actions {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+}
+
+.confirmation-dialog-actions .action-button,
+.feedback-dialog-actions .action-button {
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 64px !important;
+}
+
 @keyframes pulseGlow {
   0%,
   100% {

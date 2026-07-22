@@ -15,9 +15,9 @@ export function ConfirmationDialog({ open, title, body, onCancel, onConfirm }: C
       <DialogContent>
         <Typography color="text.secondary">{body}</Typography>
       </DialogContent>
-      <DialogActions className="dialog-actions">
-        <Button className="action-button" onClick={onCancel}>Cancel</Button>
+      <DialogActions className="dialog-actions confirmation-dialog-actions">
         <Button className="action-button" variant="contained" onClick={onConfirm}>Submit</Button>
+        <Button className="action-button" onClick={onCancel}>Cancel</Button>
       </DialogActions>
     </Dialog>
   );

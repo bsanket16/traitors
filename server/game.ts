@@ -44,6 +44,8 @@ const createRoomId = () => {
   return id;
 };
 
+const normalizedName = (name: string) => name.trim().toLocaleLowerCase();
+
 const publicPlayer = (player: Player): PublicPlayer => ({
   id: player.id,
   name: player.name,
@@ -171,6 +173,9 @@ export const joinRoom = (roomId: string, name: string, socketId: string, session
   if (!room) throw new Error('Room not found');
   if (room.phase !== 'lobby') throw new Error('This game has already started');
   if (room.players.size >= 12) throw new Error('Room is full');
+  if ([...room.players.values()].some((player) => normalizedName(player.name) === normalizedName(name))) {
+    throw new Error('That name is already taken in this village. Choose another.');
+  }
 
   const playerId = randomId(12);
   const player: Player = {
