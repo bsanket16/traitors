@@ -25,6 +25,9 @@ export function CreateRoomPage() {
             {error && <Alert severity="error">{error}</Alert>}
             <TextField label="Player Name" value={name} onChange={(event) => setName(event.target.value)} autoFocus />
             <Button className="action-button" startIcon={<AcUnit />} type="submit" variant="contained" disabled={!name.trim()}>New Village</Button>
+            <Typography color="text.secondary" textAlign="center" sx={{ px: 1 }}>
+              Waking the village can take a moment. If it seems quiet, give it another try again.
+            </Typography>
           </Stack>
         </Paper>
       </Stack>

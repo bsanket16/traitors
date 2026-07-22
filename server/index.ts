@@ -4,7 +4,9 @@ import { createServer } from 'node:http';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Server } from 'socket.io';
+import { randomBytes } from 'node:crypto';
 import type { ClientToServerEvents, ServerToClientEvents, SocketResponse } from '../shared/types.js';
+import type { Room } from './game.js';
 import {
   acknowledgeRole,
   advanceReadyPhase,
@@ -15,6 +17,8 @@ import {
   getPlayerBySocket,
   joinRoom,
   leaveRoom,
+  hasConnectedPlayers,
+  markGameAbandoned,
   reconnectPlayer,
   revealResultByOverseer,
   resetToLobby,
@@ -26,6 +30,7 @@ import {
   submitSaveVote,
   nextRound
 } from './game.js';
+import { getAnalytics, recordFeedback } from './analytics.js';
 
 const app = express();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -44,6 +49,58 @@ const io = new Server<ClientToServerEvents, ServerToClientEvents>(server, {
 
 app.use(cors({ origin: allowedOrigins }));
 app.use(express.json());
+const adminPassword = process.env.ADMIN_PASSWORD;
+if (!adminPassword) throw new Error('ADMIN_PASSWORD must be set before starting the server.');
+const adminTokens = new Set<string>();
+const abandonedGameTimers = new Map<string, ReturnType<typeof setTimeout>>();
+
+const clearAbandonedGameTimer = (roomId: string) => {
+  const timer = abandonedGameTimers.get(roomId);
+  if (timer) clearTimeout(timer);
+  abandonedGameTimers.delete(roomId);
+};
+
+const scheduleAbandonedGameCheck = (room: Room) => {
+  if (hasConnectedPlayers(room)) return;
+  clearAbandonedGameTimer(room.id);
+  abandonedGameTimers.set(room.id, setTimeout(() => {
+    if (!hasConnectedPlayers(room)) markGameAbandoned(room);
+    abandonedGameTimers.delete(room.id);
+  }, 30 * 60 * 1000));
+};
+
+app.post('/api/feedback', async (request, response) => {
+  const name = typeof request.body?.name === 'string' ? request.body.name.trim() : '';
+  const contact = typeof request.body?.contact === 'string' ? request.body.contact.trim() : '';
+  const message = typeof request.body?.message === 'string' ? request.body.message.trim() : '';
+  if (!name || !message) return response.status(400).json({ error: 'Please enter your name and feedback.' });
+  if (name.length > 80 || contact.length > 160 || message.length > 4000) return response.status(400).json({ error: 'Please shorten your feedback.' });
+  try {
+    await recordFeedback({ name, contact, message });
+    return response.status(201).json({ ok: true });
+  } catch (error) {
+    console.error('Could not save feedback:', error);
+    return response.status(503).json({ error: 'Feedback could not be saved. Please try again.' });
+  }
+});
+
+app.post('/api/admin/login', (request, response) => {
+  if (request.body?.password !== adminPassword) return response.status(401).json({ error: 'Incorrect password.' });
+  const token = randomBytes(32).toString('hex');
+  adminTokens.add(token);
+  return response.json({ token });
+});
+
+app.get('/api/admin/stats', async (request, response) => {
+  const token = request.header('authorization')?.replace(/^Bearer\s+/i, '');
+  if (!token || !adminTokens.has(token)) return response.status(401).json({ error: 'Admin access required.' });
+  try {
+    return response.json(await getAnalytics());
+  } catch (error) {
+    console.error('Could not load analytics:', error);
+    return response.status(503).json({ error: 'Analytics are temporarily unavailable.' });
+  }
+});
 app.use(express.static(clientDist));
 
 app.get('/health', (_request, response) => response.json({ ok: true }));
@@ -75,6 +132,7 @@ const detachSocketFromCurrentRoom = (socketId: string) => {
   if (!previous) return;
   socketId && io.sockets.sockets.get(socketId)?.leave(previous.room.id);
   broadcastState(previous.room.id);
+  scheduleAbandonedGameCheck(previous.room);
 };
 
 io.on('connection', (socket) => {
@@ -105,6 +163,7 @@ io.on('connection', (socket) => {
       const current = getPlayerBySocket(socket.id);
       if (current && (current.room.id !== roomId || current.player.id !== playerId)) detachSocketFromCurrentRoom(socket.id);
       const { room, player } = reconnectPlayer(roomId, playerId, socket.id, sessionId);
+      clearAbandonedGameTimer(room.id);
       socket.join(room.id);
       broadcastState(room.id);
       return buildState(room, player.id);
@@ -117,6 +176,7 @@ io.on('connection', (socket) => {
       if (match) {
         socket.leave(match.room.id);
         broadcastState(match.room.id);
+        scheduleAbandonedGameCheck(match.room);
       }
       return null;
     });
@@ -250,6 +310,7 @@ io.on('connection', (socket) => {
       advanceReadyPhase(match.room);
       socket.to(match.room.id).emit('playerDisconnected', match.player.name);
       broadcastState(match.room.id);
+      scheduleAbandonedGameCheck(match.room);
     }
   });
 });

@@ -1,4 +1,5 @@
 import type { ClientGameState, Phase, PublicPlayer, RevealedPlayer, Role, RoundResult, Winner } from '../shared/types.js';
+import { recordGameAbandoned, recordGameCompleted, recordGameStarted, recordVillageCreated } from './analytics.js';
 
 interface Player {
   id: string;
@@ -12,7 +13,7 @@ interface Player {
   hasSeenRole: boolean;
 }
 
-interface Room {
+export interface Room {
   id: string;
   hostId: string;
   players: Map<string, Player>;
@@ -26,6 +27,8 @@ interface Room {
   pendingNightResult: RoundResult | null;
   lastResult: RoundResult | null;
   winner: Winner;
+  gameStartedLogged: boolean;
+  gameFinalized: boolean;
 }
 
 const rooms = new Map<string, Room>();
@@ -94,6 +97,8 @@ export const getPlayerBySocket = (socketId: string) => {
   return null;
 };
 
+export const hasConnectedPlayers = (room: Room) => [...room.players.values()].some((player) => player.isConnected);
+
 export const buildState = (room: Room, playerId: string): ClientGameState => {
   const player = room.players.get(playerId);
   if (!player) throw new Error('Player not found');
@@ -151,10 +156,13 @@ export const createRoom = (name: string, socketId: string, sessionId: string) =>
     councilStartedWithAlive: null,
     pendingNightResult: null,
     lastResult: null,
-    winner: null
+    winner: null,
+    gameStartedLogged: false,
+    gameFinalized: false
   };
 
   rooms.set(roomId, room);
+  recordVillageCreated();
   return { room, player };
 };
 
@@ -247,7 +255,25 @@ export const startGame = (room: Room, playerId: string) => {
   room.pendingNightResult = null;
   room.lastResult = null;
   room.winner = null;
+  room.gameStartedLogged = true;
+  room.gameFinalized = false;
+  recordGameStarted(room.players.size);
   return room;
+};
+
+const finishGame = (room: Room, winner: Exclude<Winner, null>) => {
+  room.winner = winner;
+  room.phase = 'gameOver';
+  if (room.gameStartedLogged && !room.gameFinalized) {
+    room.gameFinalized = true;
+    recordGameCompleted(winner);
+  }
+};
+
+export const markGameAbandoned = (room: Room) => {
+  if (!room.gameStartedLogged || room.gameFinalized || room.phase === 'gameOver') return;
+  room.gameFinalized = true;
+  recordGameAbandoned();
 };
 
 export const acknowledgeRole = (room: Room, playerId: string) => {
@@ -260,8 +286,7 @@ export const acknowledgeRole = (room: Room, playerId: string) => {
 
 const checkTraitorWin = (room: Room) => {
   if (livingTraitors(room) >= livingNonTraitors(room)) {
-    room.winner = 'traitor';
-    room.phase = 'gameOver';
+    finishGame(room, 'traitor');
     return true;
   }
   return false;
@@ -286,8 +311,7 @@ export const submitSaveVote = (room: Room, playerId: string, targetId: string) =
   const target = room.players.get(targetId);
   if (room.phase !== 'save') throw new Error('Save voting is not active');
   if (!player?.isAlive) throw new Error('Only alive players can vote');
-  if (!target?.isAlive) throw new Error('Choose an alive player');
-  if (player.role === 'doctor' && target.id === player.id) throw new Error('Choose another alive player');
+  if (!target?.isAlive || target.id === player.id) throw new Error('Choose another alive player');
   if (room.saveVotes.has(playerId)) throw new Error('You already submitted');
   room.saveVotes.set(playerId, targetId);
   if (submittedVotes(room, room.saveVotes) >= requiredVotes(room)) resolveNight(room);
@@ -372,11 +396,9 @@ export const eliminatePlayer = (room: Room, playerId: string, targetId: string) 
     kind: 'vote'
   };
   if (target.role === 'traitor') {
-    room.winner = 'innocents';
-    room.phase = 'gameOver';
+    finishGame(room, 'innocents');
   } else if (finalCouncil) {
-    room.winner = 'traitor';
-    room.phase = 'gameOver';
+    finishGame(room, 'traitor');
   } else {
     checkTraitorWin(room);
   }
@@ -401,8 +423,7 @@ const resolveElimination = (room: Room) => {
       kind: 'vote'
     };
     if (finalCouncil) {
-      room.winner = 'traitor';
-      room.phase = 'gameOver';
+      finishGame(room, 'traitor');
     } else {
       room.phase = 'result';
     }
@@ -423,13 +444,11 @@ const resolveElimination = (room: Room) => {
   };
 
   if (target.role === 'traitor') {
-    room.winner = 'innocents';
-    room.phase = 'gameOver';
+    finishGame(room, 'innocents');
     return;
   }
   if (finalCouncil) {
-    room.winner = 'traitor';
-    room.phase = 'gameOver';
+    finishGame(room, 'traitor');
     return;
   }
   if (!checkTraitorWin(room)) room.phase = 'result';
@@ -475,6 +494,7 @@ export const resetToLobby = (room: Room, playerId: string) => {
 
 export const restartGame = (room: Room, playerId: string) => {
   if (room.hostId !== playerId) throw new Error('Only the Overseer may restart');
+  markGameAbandoned(room);
   resetRoomToLobby(room);
   startGame(room, playerId);
 };

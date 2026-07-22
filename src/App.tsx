@@ -5,6 +5,7 @@ import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { LoadingOverlay } from './components/LoadingOverlay';
 import { Page } from './components/Page';
 import { CreateRoomPage } from './pages/CreateRoomPage';
+import { AdminPage } from './pages/AdminPage';
 import { DiscussionPage } from './pages/DiscussionPage';
 import { EliminatedPage } from './pages/EliminatedPage';
 import { GameOverPage } from './pages/GameOverPage';
@@ -100,6 +101,7 @@ export default function App() {
           <Route path="/" element={<AnimatedRoute><HomePage /></AnimatedRoute>} />
           <Route path="/create" element={<AnimatedRoute><CreateRoomPage /></AnimatedRoute>} />
           <Route path="/join" element={<AnimatedRoute><JoinRoomPage /></AnimatedRoute>} />
+          <Route path="/admin" element={<AnimatedRoute><AdminPage /></AnimatedRoute>} />
           <Route path="/lobby" element={<RequireGame><Page><LobbyPage /></Page></RequireGame>} />
           <Route path="/role" element={<RequireGame><Page><RoleRevealPage /></Page></RequireGame>} />
           <Route path="/kill" element={<RequireGame><Page><PhaseVotePage kind="kill" /></Page></RequireGame>} />

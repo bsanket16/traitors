@@ -10,7 +10,7 @@ const copy: Record<Role, { title: string; body: string }> = {
   },
   doctor: {
     title: 'You are the Guardian',
-    body: 'Each night, choose one player who might survive the darkness. You may choose yourself.'
+    body: 'Each night, choose one other player who might survive the darkness.'
   },
   innocent: {
     title: 'You are a Citizen',
