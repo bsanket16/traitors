@@ -26,13 +26,17 @@ export function AdminPage() {
     try {
       const response = await apiRequest('/api/admin/stats', { headers: { Authorization: `Bearer ${accessToken}` } });
       const result = await response.json() as Analytics & { error?: string };
-      if (!response.ok) throw new Error(result.error ?? 'Could not load analytics.');
+      if (!response.ok) {
+        if (response.status === 401) {
+          sessionStorage.removeItem(tokenKey);
+          setToken('');
+        }
+        throw new Error(result.error ?? 'Could not load analytics.');
+      }
       setStats(result);
       setError('');
     } catch (loadError) {
       setStats(null);
-      sessionStorage.removeItem(tokenKey);
-      setToken('');
       setError(loadError instanceof Error ? loadError.message : 'Could not load analytics.');
     } finally { setLoading(false); }
   };
